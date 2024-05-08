@@ -22,8 +22,18 @@ Javaベースのタスク管理アプリケーション
    - すでに登録されたタスクを削除する
 
 ## シーケンス図
-TODO
-plantUMLなどで作成予定
+```mermaid
+sequenceDiagram
+Note over Client, AuthServer: ログイン
+    Client->>AuthServer: /login
+    AuthServer->>Client: 200 OK
+
+Note over Client, AppServer: タスク追加,更新,削除    
+    Client->>AppServer: /add, /update, /delete
+    AppServer->>AuthServer: auth
+    AuthServer->>AppServer: 200 OK
+    AppServer->>Client: 200 OK
+```
 
 ## 利用技術
 ### 言語・フレームワーク
