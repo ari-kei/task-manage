@@ -24,15 +24,15 @@ Javaベースのタスク管理アプリケーション
 ## シーケンス図
 ```mermaid
 sequenceDiagram
-Note over Client, AuthServer: ログイン
-    Client->>AuthServer: /login
-    AuthServer->>Client: 200 OK
+Note over WebServer, AuthServer: ログイン
+    WebServer->>AuthServer: /login
+    AuthServer->>WebServer: 200 OK
 
-Note over Client, AppServer: タスク追加,更新,削除    
-    Client->>AppServer: /add, /update, /delete
+Note over WebServer, AppServer: タスク追加,更新,削除    
+    WebServer->>AppServer: /add, /update, /delete
     AppServer->>AuthServer: auth
     AuthServer->>AppServer: 200 OK
-    AppServer->>Client: 200 OK
+    AppServer->>WebServer: 200 OK
 ```
 
 ## 利用技術
