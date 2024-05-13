@@ -4,12 +4,19 @@ info:
   version: "1.0"
 servers:
   - url: http://localhost:9000/app
-# TODO それぞれのリクエストヘッダーに認証トークンを設定する
 # TODO　レスポンスコード200以外のレスポンスを追加する
 paths:
   /task:
     post:
       summary: "タスク追加"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            default: Bearer <token>
+          required: true
+          description: 認証トークン
       requestBody:
         content:
           application/json:
@@ -27,6 +34,14 @@ paths:
   /tasks:
     get:
       summary: "タスク一覧取得"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            default: Bearer <token>
+          required: true
+          description: 認証トークン
       requestBody:
         content:
           application/json:
@@ -45,6 +60,13 @@ paths:
     get:
       summary: "タスク取得"
       parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            default: Bearer <token>
+          required: true
+          description: 認証トークン
         - in: path
           name: taskId
           required: true
@@ -62,6 +84,13 @@ paths:
     post:
       summary: "タスク更新"
       parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            default: Bearer <token>
+          required: true
+          description: 認証トークン
         - in: path
           name: taskId
           required: true
@@ -84,6 +113,13 @@ paths:
     delete:
       summary: "タスク削除"
       parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            default: Bearer <token>
+          required: true
+          description: 認証トークン
         - in: path
           name: taskId
           required: true
