@@ -3,7 +3,7 @@ info:
   title: タスク管理API
   version: "1.0"
 servers:
-  - url: http://localhost:9000/app
+  - url: http://localhost:9000/
 # TODO　レスポンスコード200以外のレスポンスを追加する
 paths:
   /task:
