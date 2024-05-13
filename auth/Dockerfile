@@ -1,4 +1,1 @@
-FROM ubuntu:latest
-LABEL authors="Keisuke"
-
-ENTRYPOINT ["top", "-b"]
+FROM azul/zulu-openjdk:21.0.3-jdk
