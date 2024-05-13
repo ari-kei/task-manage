@@ -1,0 +1,14 @@
+version: '3'
+services:
+#  web:
+#  auth:
+#  app:
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./app/doc/api/task-api.yaml:/usr/share/nginx/html/app/task-api.yaml
+    environment:
+      API_URL: app/task-api.yaml

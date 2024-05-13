@@ -1,0 +1,131 @@
+openapi: "3.0.2"
+info:
+  title: タスク管理API
+  version: "1.0"
+servers:
+  - url: http://localhost:9000/app
+# TODO それぞれのリクエストヘッダーに認証トークンを設定する
+# TODO　レスポンスコード200以外のレスポンスを追加する
+paths:
+  /task:
+    post:
+      summary: "タスク追加"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+  /tasks:
+    get:
+      summary: "タスク一覧取得"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+  /task/{taskId}:
+    get:
+      summary: "タスク取得"
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          description: タスクID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: "タスク更新"
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          description: タスクID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Task'
+    delete:
+      summary: "タスク削除"
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          description: タスクID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: タスクID(ULID)
+        name:
+          type: string
+          description: タスク名
+        task_description:
+          type: string
+          description: タスク説明
+        deadline_date:
+          type: string
+          format: date
+          description: 期限
+        is_completed:
+          type: boolean
+          default: false
+          description: 完了フラグ
+    ListParam:
+      properties:
+        offset:
+          required: true
+          type: integer
+          description: オフセット
+        limit:
+          type: integer
+          default: 20
+          description: 最大取得件数
