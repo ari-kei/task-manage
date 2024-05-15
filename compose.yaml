@@ -1,8 +1,12 @@
 version: '3'
 services:
-#  web:
-#  auth:
-#  app:
+  #  web:
+  auth:
+    build:
+      context: ./
+      dockerfile: ./auth/Dockerfile
+    tty: true
+  #  app:
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: swagger-ui
