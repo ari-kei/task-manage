@@ -21,6 +21,45 @@ Javaベースのタスク管理アプリケーション
 6. タスクの削除
    - すでに登録されたタスクを削除する
 
+## 機能詳細  
+- ユーザ認証・認可  
+  - すべてのユーザーはタスクボードを作成できる
+  - すべてのユーザーは自らが作成したタスクボードの更新・削除ができる
+  - すべてのユーザーは自らが作成したタスクボードにメンバーを追加できる
+  - タスクボードのメンバーはボードにタスクを追加・更新・削除できる
+  - システム管理者はすべてのボードを更新・削除できる
+
+## ER図
+```mermaid
+erDiagram
+  Users {
+    string ID PK
+    string hashed_password
+    string name
+    string role
+  }
+  Members {
+    string user_id PK
+    string task_bord_id PK,FK
+  }
+  TaskBords {
+    string id PK
+    string name
+    string user_id
+  }
+  Tasks {
+    string id PK
+    string name
+    string detail
+    date due_date
+    string user_id
+  }
+
+  Users ||--o{ Members : ""
+  Members }|--|| TaskBords : ""
+  TaskBords }|--o{ Tasks : ""
+```
+
 ## シーケンス図
 ```mermaid
 sequenceDiagram
