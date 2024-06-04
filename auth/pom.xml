@@ -12,7 +12,7 @@
 	<artifactId>auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>auth</name>
-	<description>Demo project for Spring Boot</description>
+	<description>AUTHサーバ</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
@@ -53,6 +53,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+          <executable>true</executable>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
