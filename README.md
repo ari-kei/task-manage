@@ -65,13 +65,14 @@ erDiagram
 sequenceDiagram
 Note over WebServer, AuthServer: ログイン
     WebServer->>AuthServer: /login
-    AuthServer->>WebServer: 200 OK
+    AuthServer->>WebServer: JWT返却
 
 Note over WebServer, AppServer: タスク追加,更新,削除    
-    WebServer->>AppServer: /add, /update, /delete
-    AppServer->>AuthServer: auth
-    AuthServer->>AppServer: 200 OK
-    AppServer->>WebServer: 200 OK
+    WebServer->>AppServer: /get, /add, /update, /delete with JWT
+    AppServer->>AuthServer: /verify with JWT
+    AuthServer->>AppServer: ユーザ情報
+    AppServer->>AppServer: 認可
+    AppServer->>WebServer: OK
 ```
 
 ## 利用技術
