@@ -5,8 +5,8 @@
 ## ディレクトリ構成
 auth  
   ├── AuthApplication.java  
-  ├── domain : ビジネスルールを記載  
-  ├── driver : DBや外部ファイルなどの外部リソースとのやり取りを記載  
+  ├── domains : ビジネスルールを記載  
+  ├── drivers : DBや外部ファイルなどの外部リソースとのやり取りを記載  
   └── interfaces : 外部とのインターフェース  
-    ├── authenticator : 認証関連  
-    └── verifier : 検証関連  
+    ├── authenticate : 認証関連  
+    └── verify : 検証関連  
