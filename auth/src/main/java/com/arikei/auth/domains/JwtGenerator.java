@@ -1,33 +1,39 @@
 package com.arikei.auth.domains;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.KeyFactory;
-import java.security.PrivateKey;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.OffsetDateTime;
 import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.arikei.auth.domains.entities.AuthInfo;
+import com.arikei.auth.domains.repositoryif.JwtPrivateKeyRepositoryIF;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 public class JwtGenerator {
 
-  private Algorithm alg;
+  private JwtPrivateKeyRepositoryIF jwtPrivateKeyRepositoryIF;
+
   // jwtの有効期限(単位：分)
   private final int EXPIRED_AT = 60;
+  private final String BEGIN_RSA_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----";
+  private final String END_RSA_PRIVATE_KEY = "-----END RSA PRIVATE KEY-----";
 
-  public JwtGenerator() {
-    PrivateKey privateKey = getPrivateKey();
-    // TODO 環境変数から秘密鍵の場所を取得して、読み込み
-    this.alg = Algorithm.RSA256();
+  public JwtGenerator(JwtPrivateKeyRepositoryIF jwtPrivateKeyRepositoryIF) {
+    this.jwtPrivateKeyRepositoryIF = jwtPrivateKeyRepositoryIF;
   }
 
   public String generateJwt(AuthInfo authInfo) {
+    Optional<RSAPrivateKey> privatekeyOptional = getPrivateKey();
+    if (privatekeyOptional.isEmpty()) {
+      // TODO 鍵が取得できなかった際の処理
+    }
     return JWT.create()
         .withIssuer("TaskManagerAuth")
         .withSubject(authInfo.getUserId())
@@ -35,18 +41,28 @@ public class JwtGenerator {
         .withIssuedAt(OffsetDateTime.now().toInstant())
         .withJWTId(UUID.randomUUID().toString())
         .withClaim("role", authInfo.getRole())
-        .sign(alg);
+        .sign(Algorithm.RSA256(privatekeyOptional.get()));
   }
 
-  private PrivateKey getPrivateKey(Path path) {
-    try (Stream<String> stream = Files.lines(path)) {
-      // PEMの先頭と末尾を削除
-      String pem = stream.filter(s -> !"-----BEGIN RSA PRIVATE KEY-----".equals(s)
-          && !"-----END RSA PRIVATE KEY-----".equals(s)
-          && !"\r\n".equals(s)).collect(Collectors.joining());
+  private Optional<RSAPrivateKey> getPrivateKey() {
+    List<String> privateKeyLine = jwtPrivateKeyRepositoryIF.get();
 
-      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(pem));
-      return KeyFactory.getInstance("RSA", new BouncyCastleProvider()).generatePrivate(keySpec);
+    StringBuilder pemBuilder = new StringBuilder();
+    for (String line : privateKeyLine) {
+      if (this.BEGIN_RSA_PRIVATE_KEY.equals(line) || this.END_RSA_PRIVATE_KEY.equals(line)) {
+        continue;
+      }
+      pemBuilder.append(line);
     }
+    RSAPrivateKey rsaPrivateKey = null;
+    try {
+      rsaPrivateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA")
+          .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(pemBuilder.toString())));
+    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      return Optional.empty();
+    }
+    return Optional.of(rsaPrivateKey);
   }
 }
