@@ -1,4 +1,4 @@
-package com.arikei.auth.configures;
+package com.arikei.auth.domains;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
