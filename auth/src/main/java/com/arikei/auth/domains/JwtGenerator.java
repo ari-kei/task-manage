@@ -36,11 +36,11 @@ public class JwtGenerator {
     }
     return JWT.create()
         .withIssuer("TaskManagerAuth")
-        .withSubject(authInfo.getUserId())
+        .withSubject(authInfo.userId())
         .withExpiresAt(OffsetDateTime.now().plusMinutes(this.EXPIRED_AT).toInstant())
         .withIssuedAt(OffsetDateTime.now().toInstant())
         .withJWTId(UUID.randomUUID().toString())
-        .withClaim("role", authInfo.getRole())
+        .withClaim("role", authInfo.role())
         .sign(Algorithm.RSA256(privatekeyOptional.get()));
   }
 
