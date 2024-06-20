@@ -34,16 +34,20 @@ public class Authenticator {
    */
   // NOTE
   // https://github.com/ari-kei/task-manage/blob/main/auth/doc/designDoc/Domain_LoginInfo_Object_or_String.md
-  public String authenticate(LoginInfo LoginInfo) {
+  public String authenticate(LoginInfo LoginInfo) throws IllegalArgumentException {
     Optional<User> user = this.userRepositoryIF.findById(LoginInfo.getUserId());
     if (!user.isPresent()) {
-      // TODO 認証失敗(403)
+      System.out.println("User does not exist");
+      throw new IllegalArgumentException();
     }
 
-    if (!this.passwordEncoder.getPasswordEncoder().matches(LoginInfo.getPassword(), user.get().getHashedPassword())) {
-      // TODO 認証失敗(403)
+    if (!this.passwordEncoder.getPasswordEncoder().matches(LoginInfo.getPassword(),
+        user.get().getHashedPassword())) {
+      System.out.println("Password does not match");
+      throw new IllegalArgumentException();
     }
 
-    return this.jwtGenerator.generateJwt(new AuthInfo(user.get().getUserId(), user.get().getRole()));
+    return this.jwtGenerator
+        .generateJwt(new AuthInfo(user.get().getUserId(), user.get().getRole()));
   }
 }
