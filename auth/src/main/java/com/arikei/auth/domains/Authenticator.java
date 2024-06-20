@@ -47,8 +47,6 @@ public class Authenticator {
       throw new IllegalArgumentException();
     }
 
-    String role = user.get().getRole();
-    String userId = user.get().getUserId();
     return this.jwtGenerator
         .generateJwt(new AuthInfo(user.get().getUserId(), user.get().getRole()));
   }
