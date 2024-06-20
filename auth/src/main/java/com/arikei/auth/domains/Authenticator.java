@@ -35,18 +35,20 @@ public class Authenticator {
   // NOTE
   // https://github.com/ari-kei/task-manage/blob/main/auth/doc/designDoc/Domain_LoginInfo_Object_or_String.md
   public String authenticate(LoginInfo LoginInfo) throws IllegalArgumentException {
-    Optional<User> user = this.userRepositoryIF.findById(LoginInfo.getUserId());
+    Optional<User> user = this.userRepositoryIF.findById(LoginInfo.userId());
     if (!user.isPresent()) {
       System.out.println("User does not exist");
       throw new IllegalArgumentException();
     }
 
-    if (!this.passwordEncoder.getPasswordEncoder().matches(LoginInfo.getPassword(),
+    if (!this.passwordEncoder.getPasswordEncoder().matches(LoginInfo.password(),
         user.get().getHashedPassword())) {
       System.out.println("Password does not match");
       throw new IllegalArgumentException();
     }
 
+    String role = user.get().getRole();
+    String userId = user.get().getUserId();
     return this.jwtGenerator
         .generateJwt(new AuthInfo(user.get().getUserId(), user.get().getRole()));
   }
