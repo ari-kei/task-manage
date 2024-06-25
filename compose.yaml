@@ -6,6 +6,8 @@ services:
       context: ./
       dockerfile: ./auth/Dockerfile
     tty: true
+    environment:
+      ENV: local
   #  app:
   swagger-ui:
     image: swaggerapi/swagger-ui
