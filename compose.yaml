@@ -8,6 +8,9 @@ services:
     tty: true
     environment:
       ENV: local
+    secrets:
+      - auth_privatekey
+      - auth_publickey
   #  app:
   swagger-ui:
     image: swaggerapi/swagger-ui
@@ -19,3 +22,8 @@ services:
       - ./auth/doc/api/auth-api.yaml:/usr/share/nginx/html/auth-api.yaml
     environment:
       API_URL: /task-api.yaml
+secrets:
+  auth_privatekey:
+    file: auth/crt/privatekey.pem
+  auth_publickey:
+    file: auth/crt/pubkey.pem
