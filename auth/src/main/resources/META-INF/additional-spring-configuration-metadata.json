@@ -1,12 +1,12 @@
 {
   "properties": [
     {
-      "name": "key.private",
+      "name": "key.publickey",
       "type": "java.lang.String",
       "description": "A description for 'key.private'"
     },
     {
-      "name": "key.public",
+      "name": "key.privatekey",
       "type": "java.lang.String",
       "description": "A description for 'key.public'"
     }
