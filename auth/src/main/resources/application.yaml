@@ -1,3 +1,15 @@
 spring:
   application:
     name: auth
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+  tomcat:
+    accept-count: 500
+    max-connections: 10000
+    threads:
+      max: 500
+      min-spare: 500
