@@ -31,10 +31,6 @@ public class JwtGenerator {
   // jwtの有効期限(単位：分)
   private final String ISSUER = "TaskManagerAuth";
   private final int EXPIRED_AT = 60;
-  private final String BEGIN_RSA_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----";
-  private final String END_RSA_PRIVATE_KEY = "-----END RSA PRIVATE KEY-----";
-  private final String BEGIN_RSA_PUBLIC_KEY = "-----BEGIN RSA PUBLIC KEY-----";
-  private final String END_RSA_PUBLIC_KEY = "-----END RSA PUBLIC KEY-----";
   private final String PRIVATE_MAP_KEY = "private";
   private final String PUBLIC_MAP_KEY = "public";
 
@@ -76,12 +72,11 @@ public class JwtGenerator {
     // 秘密鍵取得
     String privateKey = jwtKeyRepositoryIF.getPrivateKey();
     String privateKeyTrimmed =
-        privateKey.replace(this.BEGIN_RSA_PRIVATE_KEY, "").replace(this.END_RSA_PRIVATE_KEY, "");
-
+        privateKey.replaceAll("-----.+?-----", "").replaceAll("\n", "").replaceAll("\r", "").trim();
     // 公開鍵取得
     String publicKey = jwtKeyRepositoryIF.getPublicKey();
     String publicKeyTrimmed =
-        publicKey.replace(this.BEGIN_RSA_PUBLIC_KEY, "").replace(this.END_RSA_PUBLIC_KEY, "");
+        publicKey.replaceAll("-----.+?-----", "").replaceAll("\n", "").replaceAll("\r", "").trim();
     RSAPrivateKey rsaPrivateKey = null;
     RSAPublicKey rsaPublicKey = null;
     try {
