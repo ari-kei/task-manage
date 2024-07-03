@@ -1,6 +1,9 @@
 spring:
   application:
     name: auth
+logging:
+  level:
+    root: INFO
 server:
   port: 8080
   servlet:
