@@ -77,8 +77,8 @@ Note over WebServer, AppServer: タスク追加,更新,削除
 
 ## 利用技術
 ### 言語・フレームワーク
-- Java：TODOバージョン記載  
-  - Spring：TODOバージョン記載
+- Java：21  
+  - Spring：spring-boot-starter-parent 3.3.1
 
 ### ミドルウェア
 TODO必要があれば記載
