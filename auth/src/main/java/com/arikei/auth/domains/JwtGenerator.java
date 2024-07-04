@@ -55,7 +55,7 @@ public class JwtGenerator {
     return JWT.create().withIssuer(this.ISSUER).withSubject(authInfo.userId())
         .withExpiresAt(OffsetDateTime.now().plusMinutes(this.EXPIRED_AT).toInstant())
         .withIssuedAt(OffsetDateTime.now().toInstant()).withJWTId(UUID.randomUUID().toString())
-        .withClaim("role", authInfo.role()).sign(this.alg);
+        .sign(this.alg);
   }
 
   public DecodedJWT verifyToken(String token) {

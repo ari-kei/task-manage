@@ -57,7 +57,7 @@ public class JwtGeneratorTest {
   @Test
   void testGenerateJwt() {
     // 事前準備
-    AuthInfo authInfo = new AuthInfo("user_id_test", "role_test");
+    AuthInfo authInfo = new AuthInfo("user_id_test");
 
     JwtGenerator jwtGenerator = new JwtGenerator(new JwtKeyRepositoryMock());
 
@@ -71,6 +71,5 @@ public class JwtGeneratorTest {
 
     DecodedJWT decodedJWT = jwtGenerator.verifyToken(token);
     assertEquals("user_id_test", decodedJWT.getSubject());
-    assertEquals("role_test", decodedJWT.getClaim("role").asString());
   }
 }
