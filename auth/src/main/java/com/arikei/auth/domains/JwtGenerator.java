@@ -58,7 +58,7 @@ public class JwtGenerator {
         .sign(this.alg);
   }
 
-  public DecodedJWT verifyToken(String token) {
+  public DecodedJWT verifyToken(String token) throws JWTVerificationException {
     JWTVerifier verifier = JWT.require(this.alg).withIssuer(this.ISSUER).acceptExpiresAt(5).build();
     try {
       return verifier.verify(token);
