@@ -16,3 +16,5 @@ server:
     threads:
       max: 500
       min-spare: 500
+grpc:
+   port: 9090
