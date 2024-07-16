@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.arikei.grpc.vefiry;
+
+option java_multiple_files = true;
+option java_package = "com.arikei.grpc.verify.lib";
+option java_outer_classname = "VerifyProto";
+
+service Verify {
+  rpc Verify (VerifyRequest) returns (VerifyResponse) {}
+}
+
+message VerifyRequest {
+  string token = 1;
+}
+
+message VerifyResponse {
+  message User {
+    string name = 1;
+    string role = 2;
+  }
+  User user = 1;
+}
