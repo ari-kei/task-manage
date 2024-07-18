@@ -17,4 +17,5 @@ server:
       max: 500
       min-spare: 500
 grpc:
-   port: 9090
+  server:
+    port: 9090

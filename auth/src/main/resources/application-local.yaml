@@ -1,3 +1,6 @@
 key:
   privatekey: /run/secrets/auth_privatekey
   publickey: /run/secrets/auth_publickey
+grpc:
+  server:
+    reflectionServiceEnabled: true
