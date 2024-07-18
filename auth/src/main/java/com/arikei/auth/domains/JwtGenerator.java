@@ -62,6 +62,7 @@ public class JwtGenerator {
     JWTVerifier verifier = JWT.require(this.alg).withIssuer(this.ISSUER).acceptExpiresAt(5).build();
     try {
       return verifier.verify(token);
+      // TODO トークン有効期限切れの場合にリフレッシュのエンドポイントを呼ぶようにする？
     } catch (JWTVerificationException e) {
       System.out.println("JWT verification failed..");
       throw e;
