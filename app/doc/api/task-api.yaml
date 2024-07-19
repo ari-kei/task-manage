@@ -39,6 +39,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Board'
+  /board/{boardId}:
+    get:
+      summary: "ボード取得"
+      parameters:
+        - $ref: '#/components/parameters/Token'
+        - in: path
+          name: boardId
+          required: true
+          description: ボードID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardWithTaskMember'
   /task:
     post:
       summary: "タスク追加"
@@ -156,6 +174,28 @@ components:
         name:
           type: string
           description: ボード名
+    BoardWithTaskMember:
+      type: object
+      required:
+        - id
+        - name
+        - members
+      properties:
+        id:
+          type: string
+          description: ボードID(ULID)
+        name:
+          type: string
+          description: ボード名
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        memberIds:
+          type: array
+          description: メンバーID(ULID)の配列
+          items:
+            type: string
     Task:
       type: object
       required:
