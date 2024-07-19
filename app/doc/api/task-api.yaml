@@ -6,6 +6,25 @@ servers:
   - url: http://localhost:9000/
 # TODO　レスポンスコード200以外のレスポンスを追加する
 paths:
+  /board:
+    post:
+      summary: "ボード作成"
+      parameters:
+        - $ref: '#/components/parameters/Token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Board'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Board'
   /task:
     post:
       summary: "タスク追加"
@@ -111,6 +130,18 @@ components:
       required: true
       description: 認証トークン
   schemas:
+    Board:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: ボードID(ULID)
+        name:
+          type: string
+          description: ボード名
     Task:
       type: object
       required:
