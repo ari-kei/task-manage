@@ -57,6 +57,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BoardWithTaskMember'
+    post:
+      summary: "ボード更新"
+      parameters:
+        - $ref: '#/components/parameters/Token'
+        - in: path
+          name: boardId
+          required: true
+          description: ボードID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardWithTaskMember'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoardWithTaskMember'
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/Token'
+        - in: path
+          name: boardId
+          required: true
+          description: ボードID
+          schema:
+            type: string
+      response:
+        '200':
+          description: OK
   /task:
     post:
       summary: "タスク追加"
