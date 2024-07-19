@@ -25,6 +25,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Board'
+  /boards:
+    get:
+      summary: "ボード一覧取得"
+      parameters:
+        - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Board'
   /task:
     post:
       summary: "タスク追加"
