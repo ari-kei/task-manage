@@ -10,13 +10,7 @@ paths:
     post:
       summary: "タスク追加"
       parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            default: Bearer <token>
-          required: true
-          description: 認証トークン
+        $ref: '#/components/parameters/Token'
       requestBody:
         content:
           application/json:
@@ -35,13 +29,7 @@ paths:
     get:
       summary: "タスク一覧取得"
       parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            default: Bearer <token>
-          required: true
-          description: 認証トークン
+        $ref: '#/components/parameters/Token'
       requestBody:
         content:
           application/json:
@@ -60,19 +48,13 @@ paths:
     get:
       summary: "タスク取得"
       parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            default: Bearer <token>
-          required: true
-          description: 認証トークン
-        - in: path
-          name: taskId
-          required: true
-          description: タスクID
-          schema:
-            type: string
+        $ref: '#/components/parameters/Token'
+        in: path
+        name: taskId
+        required: true
+        description: タスクID
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -84,19 +66,13 @@ paths:
     post:
       summary: "タスク更新"
       parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            default: Bearer <token>
-          required: true
-          description: 認証トークン
-        - in: path
-          name: taskId
-          required: true
-          description: タスクID
-          schema:
-            type: string
+        $ref: '#/components/parameters/Token'
+        in: path
+        name: taskId
+        required: true
+        description: タスクID
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -113,24 +89,27 @@ paths:
     delete:
       summary: "タスク削除"
       parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            default: Bearer <token>
-          required: true
-          description: 認証トークン
-        - in: path
-          name: taskId
-          required: true
-          description: タスクID
-          schema:
-            type: string
+        $ref: '#/components/parameters/Token'
+        in: path
+        name: taskId
+        required: true
+        description: タスクID
+        schema:
+          type: string
       responses:
         '200':
           description: OK
 
 components:
+  parameters:
+    Token:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+          default: Bearer <token>
+        required: true
+        description: 認証トークン
   schemas:
     Task:
       type: object
