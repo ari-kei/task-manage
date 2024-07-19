@@ -81,13 +81,13 @@ paths:
     get:
       summary: "タスク取得"
       parameters:
-        $ref: '#/components/parameters/Token'
-        in: path
-        name: taskId
-        required: true
-        description: タスクID
-        schema:
-          type: string
+        - $ref: '#/components/parameters/Token'
+        - in: path
+          name: taskId
+          required: true
+          description: タスクID
+          schema:
+            type: string
       responses:
         '200':
           description: OK
