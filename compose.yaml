@@ -13,7 +13,15 @@ services:
     secrets:
       - auth_privatekey
       - auth_publickey
-  #  app:
+  app:
+    build:
+      context: ./
+      dockerfile: ./app/Dockerfile
+    tty: true
+    ports:
+      - 8081:8081
+    environment:
+      ENV: local
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: swagger-ui
