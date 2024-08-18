@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.arikei.app.domains.BoardService;
 import com.arikei.app.domains.entities.Board;
 import com.arikei.app.interfaces.request.CreateBoardRequest;
+import jakarta.servlet.ServletRequest;
 
 @RequestMapping("/board")
 @Controller
@@ -22,7 +23,8 @@ public class BoardController {
   }
 
   @PostMapping("")
-  public ResponseEntity<Board> Create(@RequestBody CreateBoardRequest request) {
+  public ResponseEntity<Board> Create(@RequestBody CreateBoardRequest request,
+      ServletRequest servletRequest) {
     if (request.getName().isEmpty()) {
       return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(null);
     }
