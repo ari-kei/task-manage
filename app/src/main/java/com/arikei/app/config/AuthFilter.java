@@ -1,51 +1,46 @@
 package com.arikei.app.config;
 
 import java.io.IOException;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.filter.GenericFilterBean;
-import com.arikei.grpc.verify.lib.VerifyGrpc;
 import com.arikei.grpc.verify.lib.VerifyRequest;
 import com.arikei.grpc.verify.lib.VerifyResponse;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import com.arikei.grpc.verify.lib.VerifyGrpc.VerifyBlockingStub;
 import io.grpc.StatusRuntimeException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 
 /**
  * Authサーバへトークンの検証をリクエストする
  */
-@Component
+@AllArgsConstructor
 public class AuthFilter extends GenericFilterBean {
+
+  private VerifyBlockingStub verifyBlockingStub;
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-    String requestToken = httpServletRequest.getHeader("Authorization").replaceFirst("Bearer", "").trim();
+    String requestToken =
+        httpServletRequest.getHeader("Authorization").replaceFirst("Bearer", "").trim();
 
-    // TODO サーバとポートを環境毎に変更できるようにする
-    final String server = "localhost";
-    final int port = 8080;
-    ManagedChannel channel = ManagedChannelBuilder.forAddress(server, port).usePlaintext().build();
-    VerifyGrpc.VerifyBlockingStub stub = VerifyGrpc.newBlockingStub(channel);
     VerifyRequest verifyRequest = VerifyRequest.newBuilder().setToken(requestToken).build();
-
     VerifyResponse verifyResponse = null;
     try {
-      verifyResponse = stub.verify(verifyRequest);
+      verifyResponse = verifyBlockingStub.verify(verifyRequest);
     } catch (StatusRuntimeException e) {
       e.printStackTrace();
+      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED,
+          "The token is not valid.");
       return;
     }
-
-    RequestContextHolder.currentRequestAttributes().setAttribute("userInfo", verifyResponse.getUser(),
-        RequestAttributes.SCOPE_REQUEST);
+    request.setAttribute("userName", verifyResponse.getUser().getName());
+    request.setAttribute("userRole", verifyResponse.getUser().getRole());
 
     chain.doFilter(request, response);
   }
