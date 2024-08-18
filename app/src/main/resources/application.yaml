@@ -4,4 +4,22 @@ spring:
 logging:
   level:
     root: INFO
-    '[org.springframework.security]': DEBUG 
+server:
+  port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+  tomcat:
+    accept-count: 500
+    max-connections: 10000
+    threads:
+      max: 500
+      min-spare: 500
+grpc:
+  client:
+    verify:
+      address: 'static://task-manage-auth-1:9090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
