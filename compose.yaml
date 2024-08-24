@@ -1,5 +1,15 @@
 services:
-  #  web:
+  web:
+    build:
+      context: ./
+      dockerfile: ./web/Dockerfile
+    tty: true
+    ports:
+      - 5173:5173
+    volumes:
+      - ./web/:/app
+      - node_modules:/app/node_modules:rw
+    command: npm run dev
   auth:
     build:
       context: ./
@@ -37,3 +47,5 @@ secrets:
     file: auth/crt/privatekey.pem
   auth_publickey:
     file: auth/crt/pubkey.pem
+volumes:
+  node_modules:
