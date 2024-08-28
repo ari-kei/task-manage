@@ -6,7 +6,7 @@ export default function Index() {
       <header className="sticky inset-x-0 top-0 z-50">
         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
           <div className="font-sans p-4 flex lg:flex-1">
-            <h1 className="text-3xl">タスク管理</h1>
+            <a href="/" className="text-3xl">タスク管理</a>
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <Form action="/board/new">
