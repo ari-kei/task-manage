@@ -10,7 +10,6 @@ export const action = async ({
     request.headers.get("Cookie")
   );
   const accessToken = session.get("accessToken");
-  console.log(accessToken);
   if (accessToken == undefined || accessToken.length <= 0) {
     return redirect("/login");
   }
