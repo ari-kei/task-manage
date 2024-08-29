@@ -1,10 +1,19 @@
 import { ActionFunctionArgs } from "@remix-run/node";
 import { Form, json, redirect, useActionData } from "@remix-run/react";
 import { postBoard } from "~/app";
+import { getSession } from "~/session";
 
 export const action = async ({
   request,
 }: ActionFunctionArgs) => {
+  const session = await getSession(
+    request.headers.get("Cookie")
+  );
+  const accessToken = session.get("accessToken");
+  console.log(accessToken);
+  if (accessToken == undefined || accessToken.length <= 0) {
+    return redirect("/login");
+  }
   const formData = await request.formData();
   const boardName = String(formData.get("name"));
 
@@ -21,7 +30,7 @@ export const action = async ({
     return json({ errors });
   }
 
-  const res = await postBoard(boardName).then(res => {
+  const res = await postBoard(accessToken, boardName).then(res => {
     if (!res.ok) {
       throw new Error(`レスポンスステータス: ${res.status}`);
     }
