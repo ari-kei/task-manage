@@ -13,6 +13,7 @@ import com.arikei.auth.domains.entities.LoginInfo;
 import com.arikei.auth.domains.repositoryif.JwtKeyRepositoryIF;
 import com.arikei.auth.domains.repositoryif.UserRepositoryIF;
 import com.arikei.auth.interfaces.authenticate.request.LoginRequest;
+import com.arikei.auth.interfaces.authenticate.response.LoginResponse;
 
 @RequestMapping("")
 @Controller
@@ -29,7 +30,8 @@ public class LoginController {
   }
 
   @PostMapping("login")
-  public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+  // TODO 返却する型は再考する必要があるかも(APIの定義から)
+  public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
     // リクエストの詰め替え
     LoginInfo loginInfo = new LoginInfo(request.getUserId(), request.getPassword());
 
@@ -40,9 +42,10 @@ public class LoginController {
       jwt = authenticator.authenticate(loginInfo);
     } catch (IllegalArgumentException e) {
       // TODO 引数不正の場合の対応
-      return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("unauthrized");
+      return ResponseEntity.status(HttpStatusCode.valueOf(401))
+          .body(new LoginResponse("", "unauthrized"));
     }
-    return ResponseEntity.ok().body(jwt);
+    return ResponseEntity.ok().body(new LoginResponse(jwt, ""));
   }
 
 }
