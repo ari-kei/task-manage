@@ -30,7 +30,6 @@ export const loader = async ({
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
-  console.log(data.boards)
   return (
     <>
       <div className="grid grid-cols-4 gap-4">
