@@ -1,5 +1,6 @@
 package com.arikei.app.domains;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.arikei.app.domains.entities.Board;
@@ -19,5 +20,10 @@ public class BoardService {
     board.setId(Generators.timeBasedEpochGenerator().generate().toString());
     this.boardRepositoryIF.create(board);
     return board;
+  }
+
+  public List<Board> fetchList() {
+    List<Board> boards = this.boardRepositoryIF.fetchList();
+    return boards;
   }
 }
