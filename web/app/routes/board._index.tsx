@@ -6,7 +6,6 @@ import { getSession } from "~/session";
 export const loader = async ({
   request,
 }: LoaderFunctionArgs) => {
-  console.log("ここにきているはず1")
   const session = await getSession(
     request.headers.get("Cookie")
   )
