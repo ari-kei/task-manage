@@ -1,7 +1,21 @@
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, json, redirect, useActionData } from "@remix-run/react";
 import { postBoard } from "~/app";
 import { getSession } from "~/session";
+
+export const loader = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  const session = await getSession(
+    request.headers.get("Cookie")
+  );
+  const accessToken = session.get("accessToken");
+  console.log(accessToken);
+  if (accessToken == undefined || accessToken.length <= 0) {
+    return redirect("/login");
+  }
+  return json({});
+}
 
 export const action = async ({
   request,
