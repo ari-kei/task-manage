@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, redirect, useActionData } from "@remix-run/react";
+import { Form, json, Navigate, redirect, useActionData, useNavigate } from "@remix-run/react";
 import { postBoard } from "~/app";
 import { getSession } from "~/session";
 
@@ -57,6 +57,7 @@ export const action = async ({
 
 export default function Index() {
   const actionData = useActionData<typeof action>();
+  const navigate = useNavigate();
   return (
     <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl text-center">
@@ -72,8 +73,13 @@ export default function Index() {
           ) : null}
         </p>
 
-        <div className="mt-10">
-          <button type="submit" className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">保存</button>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="mt-10">
+            <button type="submit" className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">保存</button>
+          </div>
+          <div className="mt-10">
+            <button type="submit" onClick={() => { navigate(-1) }} className="block w-full rounded-md bg-gray-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">キャンセル</button>
+          </div>
         </div>
       </Form>
     </div>
