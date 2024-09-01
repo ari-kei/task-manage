@@ -3,7 +3,6 @@ export const postBoard = async (accessToken: string, name: string) => {
   return fetch(url, {
     method: "POST",
     headers: {
-      // TODO セッションのアクセストークンを利用する
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
@@ -12,3 +11,13 @@ export const postBoard = async (accessToken: string, name: string) => {
     })
   });
 };
+
+export const fetchBoards = async (accessToken: string) => {
+  const url = "http://task-manage-app-1:8081/boards"
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    }
+  })
+}
