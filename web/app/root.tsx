@@ -50,7 +50,9 @@ export default function App() {
   return (
     <>
       <Header accessToken={accessToken} />
-      <Outlet />
+      <div className="p-10">
+        <Outlet />
+      </div>
     </>
   );
 }
