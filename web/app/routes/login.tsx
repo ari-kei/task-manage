@@ -58,7 +58,7 @@ export const action = async ({
     return;
   });
   session.set("accessToken", res.token);
-  return redirect("/", {
+  return redirect("/board", {
     headers: {
       "Set-Cookie": await commitSession(session),
     }
