@@ -1,5 +1,6 @@
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react"
+import { defer, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { Await, Outlet, useLoaderData } from "@remix-run/react"
+import { Suspense } from "react";
 import { fetchBoards } from "~/app";
 import { getSession } from "~/session";
 
@@ -13,7 +14,8 @@ export const loader = async ({
   if (accessToken == undefined || accessToken.length <= 0) {
     return redirect("/login");
   }
-  const res = await fetchBoards(accessToken).then(res => {
+
+  const boardPromise = fetchBoards(accessToken).then(res => {
     if (!res.ok) {
       throw new Error(`レスポンスステータス: ${res.status}`)
     }
@@ -22,27 +24,34 @@ export const loader = async ({
     console.log(error);
     return;
   }
-  )
-  const boards = res.data;
-
-  return json({ boards });
+  );
+  return defer({ boardsPromise: boardPromise });
 }
 
 export default function Index() {
-  const data = useLoaderData<typeof loader>();
+  const { boardsPromise } = useLoaderData<typeof loader>();
   return (
     <>
       <div className="grid grid-cols-4 gap-4">
-        {data?.boards?.map((board: { id: string, name: string }) => {
-          return (
-            <a href={"/board/" + board.id} className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-              <h5 className="mb-2 text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">{board.name}</h5>
-            </a>
-          )
-        })}
-        <a href="/board/new" className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-          <h5 className="mb-2 text-4xl text-center font-bold tracking-tight text-gray-500 dark:text-white">+</h5>
-        </a>
+
+        <Suspense fallback={
+          <h5 className="mb-2 text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">Loading...</h5>
+        }>
+          <Await resolve={boardsPromise}>
+            {(res) => {
+              return res.data.map((board: { id: string, name: string }) => {
+                return (
+                  <a key={board.id} href={"/board/" + board.id} className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <h5 className="mb-2 text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">{board.name}</h5>
+                  </a>
+                )
+              })
+            }}
+          </Await>
+          <a href="/board/new" className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
+            <h5 className="mb-2 text-4xl text-center font-bold tracking-tight text-gray-500 dark:text-white">+</h5>
+          </a>
+        </Suspense >
       </div >
       <Outlet />
     </>
