@@ -16,7 +16,6 @@ export const postBoard = async (accessToken: string, name: string) => {
 
 export const fetchBoards = async (accessToken: string) => {
   const url = baseUrl + "/boards"
-  console.log(url)
   return fetch(url, {
     method: "GET",
     headers: {
