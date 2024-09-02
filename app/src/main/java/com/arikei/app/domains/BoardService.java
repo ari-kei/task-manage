@@ -1,6 +1,7 @@
 package com.arikei.app.domains;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.arikei.app.domains.entities.Board;
@@ -25,5 +26,13 @@ public class BoardService {
   public List<Board> fetchList() {
     List<Board> boards = this.boardRepositoryIF.fetchList();
     return boards;
+  }
+
+  public Board fetch(String boardId) throws IllegalArgumentException {
+    Optional<Board> boardOptional = this.boardRepositoryIF.fetch(boardId);
+    if (boardOptional.isEmpty()) {
+      throw new IllegalArgumentException("Invalid boardId");
+    }
+    return boardOptional.get();
   }
 }
