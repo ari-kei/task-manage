@@ -1,5 +1,7 @@
+const baseUrl = "http://task-manage-app-1:8081";
+
 export const postBoard = async (accessToken: string, name: string) => {
-  const url = "http://task-manage-app-1:8081/board";
+  const url = baseUrl + "/board";
   return fetch(url, {
     method: "POST",
     headers: {
@@ -13,11 +15,22 @@ export const postBoard = async (accessToken: string, name: string) => {
 };
 
 export const fetchBoards = async (accessToken: string) => {
-  const url = "http://task-manage-app-1:8081/boards"
+  const url = baseUrl + "/boards"
+  console.log(url)
   return fetch(url, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     }
   })
+}
+
+export const fetchBoard = async (accessToken: string, boardId: string) => {
+  const url = baseUrl + `/board/${boardId}`;
+  return fetch(url,{
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    }
+  });
 }
