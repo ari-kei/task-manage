@@ -57,7 +57,7 @@ export const action = async ({
     session.flash("error", "ログインに失敗しました。再度お試しください。")
     return;
   });
-  session.set("accessToken", res.token);
+  session.set("accessToken", res.accessToken);
   return redirect("/board", {
     headers: {
       "Set-Cookie": await commitSession(session),
