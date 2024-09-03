@@ -6,9 +6,6 @@ services:
     tty: true
     ports:
       - 3000:3000
-    volumes:
-      - ./web/:/app
-      - node_modules:/app/node_modules:rw
   auth:
     build:
       context: ./
@@ -46,5 +43,3 @@ secrets:
     file: auth/crt/privatekey.pem
   auth_publickey:
     file: auth/crt/pubkey.pem
-volumes:
-  node_modules:

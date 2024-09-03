@@ -18,7 +18,8 @@ USER 1000:1000
 WORKDIR $APP
 EXPOSE 3000
 
-COPY --from=builder /app/public ${APP}/public
-COPY --from=builder /app/build ${APP}/build
-COPY --from=builder /app/package*.json ${APP}/
+COPY --chown=1000:1000 --from=builder /app/package*.json ${APP}/
+COPY --chown=1000:1000 --from=builder /app/node_modules ${APP}/node_modules
+COPY --chown=1000:1000 --from=builder /app/public ${APP}/public
+COPY --chown=1000:1000 --from=builder /app/build ${APP}/build
 CMD [ "npm", "start" ]
