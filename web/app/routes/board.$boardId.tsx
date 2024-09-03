@@ -1,7 +1,7 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react";
 import invariant from 'tiny-invariant';
-import { fetchBoard, fetchBoards } from "~/app";
+import { fetchBoard } from "~/app";
 
 import { getSession } from "~/session"
 
@@ -33,22 +33,25 @@ export const loader = async ({
 
   // TODO タスク一覧取得
 
-  const board = res;
-
-  return json({ board });
+  return json({ boardDetail: res });
 }
 
 export default function Index() {
-  const data = useLoaderData<typeof loader>();
+  const { boardDetail } = useLoaderData<typeof loader>();
+  const colLength = boardDetail.taskStatus.length;
   return (
     <>
-      <h1>{data.board.name}</h1>
-      {/* TODO タスクをステータスごとに画面表示 */}
-      <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-4">
-        <div className="flex max-w-xl flex-col items-start justify-between">a</div>
-        <div className="flex max-w-xl flex-col items-start justify-between">b</div>
-        <div className="flex max-w-xl flex-col items-start justify-between">c</div>
-        <div className="flex max-w-xl flex-col items-start justify-between">d</div>
+      <div className="mx-auto">
+        <h1 className="text-3xl">{boardDetail.board.name}</h1>
+      </div>
+      <div className={"mx-auto mt-10 grid max-w-2xl grid-cols-" + colLength + " gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-" + colLength}>
+        {
+          boardDetail.taskStatus.map((taskStatus: { boardId: string, statusId: string, statusName: string, order: number }) => {
+            return (
+              <div className="flex max-w-xl flex-col items-start justify-between">{taskStatus.statusName}</div>
+            )
+          })
+        }
       </div>
     </>
   )
