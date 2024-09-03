@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.arikei.app.domains.BoardService;
 import com.arikei.app.domains.entities.Board;
+import com.arikei.app.domains.entities.BoardDetail;
 import com.arikei.app.interfaces.request.CreateBoardRequest;
 import jakarta.servlet.ServletRequest;
 
@@ -35,13 +36,14 @@ public class BoardController {
   }
 
   @GetMapping("/{boardId}")
-  public ResponseEntity<Board> Fetch(@PathVariable String boardId, ServletRequest servletRequest) {
-    Board board;
+  public ResponseEntity<BoardDetail> Fetch(@PathVariable String boardId,
+      ServletRequest servletRequest) {
+    BoardDetail boardDetail;
     try {
-      board = this.boardService.fetch(boardId);
+      boardDetail = this.boardService.fetchDetail(boardId);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(null);
     }
-    return ResponseEntity.ok().body(board);
+    return ResponseEntity.ok().body(boardDetail);
   }
 }

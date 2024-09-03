@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.arikei.app.domains.entities.Board;
+import com.arikei.app.domains.entities.BoardDetail;
 import com.arikei.app.domains.repositoryif.BoardRepositoryIF;
 import com.fasterxml.uuid.Generators;
 
@@ -28,11 +29,11 @@ public class BoardService {
     return boards;
   }
 
-  public Board fetch(String boardId) throws IllegalArgumentException {
-    Optional<Board> boardOptional = this.boardRepositoryIF.fetch(boardId);
-    if (boardOptional.isEmpty()) {
+  public BoardDetail fetchDetail(String boardId) throws IllegalArgumentException {
+    Optional<BoardDetail> boardDetailOptional = this.boardRepositoryIF.fetchDetail(boardId);
+    if (boardDetailOptional.isEmpty()) {
       throw new IllegalArgumentException("Invalid boardId");
     }
-    return boardOptional.get();
+    return boardDetailOptional.get();
   }
 }
