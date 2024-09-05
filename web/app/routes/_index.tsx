@@ -1,5 +1,4 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Form, Outlet } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
