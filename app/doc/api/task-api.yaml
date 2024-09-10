@@ -102,7 +102,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Task'
+              $ref: '#/components/schemas/TaskCard'
       responses:
         '200':
           description: OK
@@ -111,7 +111,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Task'
+                  $ref: '#/components/schemas/TaskCard'
   /tasks:
     get:
       summary: "タスク一覧取得"
@@ -232,13 +232,31 @@ components:
           description: メンバーID(ULID)の配列
           items:
             type: string
+    TaskCard:
+      type: object
+      required:
+        - boardId
+        - name
+      properties:
+        boardId:
+          type: string
+          description: ボードID
+        taskId:
+          type: string
+          description: タスクID
+        name:
+          type: string
+          description: タスク名
     Task:
       type: object
       required:
-        - id
+        - boardId 
         - name
       properties:
-        id:
+        boardId:
+          type: string
+          description: ボードID
+        taskId:
           type: string
           description: タスクID(ULID)
         name:
