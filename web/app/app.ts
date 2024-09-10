@@ -33,3 +33,19 @@ export const fetchBoard = async (accessToken: string, boardId: string) => {
     }
   });
 }
+
+export const createTaskCard = async (accessToken: string, boardId: string, taskName: string, taskStatus: string) => {
+  const url = baseUrl + `/task`;
+  return fetch(url, {
+    method: "POST",
+      headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      boardId: boardId,
+      name: taskName,
+      status: taskStatus,
+    })
+  })
+}
