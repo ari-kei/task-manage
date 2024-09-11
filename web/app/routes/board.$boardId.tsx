@@ -1,8 +1,9 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { stringify } from "postcss";
 import { FormEventHandler, useRef } from "react";
 import invariant from 'tiny-invariant';
-import { fetchBoard } from "~/app";
+import { fetchBoard, fetchTasks } from "~/app";
 
 import { getSession } from "~/session"
 
@@ -22,7 +23,7 @@ export const loader = async ({
   const boardId = params.boardId;
 
   // FIXME ボード取得+タスク取得で非効率になっている部分の改善
-  const res = await fetchBoard(accessToken, boardId).then(res => {
+  const boardDetails = await fetchBoard(accessToken, boardId).then(res => {
     if (!res.ok) {
       throw new Error(`レスポンスステータス: ${res.status}`);
     }
@@ -32,14 +33,22 @@ export const loader = async ({
     return;
   });
 
-  // TODO タスク一覧取得
+  const tasks = await fetchTasks(accessToken, boardId).then(res => {
+    if (!res.ok) {
+      throw new Error(`レスポンスステータス: ${res.status}`);
+    }
+    return res.json();
+  }).catch(error => {
+    console.log(error);
+    return;
+  });
 
-  return json({ boardDetail: res });
+  return json({ boardDetail: boardDetails, tasks: tasks });
 }
 
 
 export default function Index() {
-  const { boardDetail } = useLoaderData<typeof loader>();
+  const { boardDetail, tasks } = useLoaderData<typeof loader>();
   const colLength = boardDetail.taskStatus.length;
   const fetcher = useFetcher();
 
@@ -90,6 +99,20 @@ export default function Index() {
                 <div className="flex max-w-xl flex-col items-start justify-between pb-3">
                   <span>{taskStatus.statusName}</span>
                 </div>
+                {
+                  tasks.sort((a: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }, b: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => { return a.order - b.order }).map((task: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => {
+                    if (taskStatus.statusId !== task.taskStatusId) {
+                      return;
+                    }
+                    return (
+                      <div className="flex max-w-full pb-4" key={task.name + task.order}>
+                        <button type="button" onClick={() => { openDialog(taskStatus.statusId); }} className="flex w-full bg-white rounded-lg shadow-lg justify-center">
+                          <p className="p-4">{task.name}</p>
+                        </button>
+                      </div>
+                    )
+                  })
+                }
                 <div className="flex max-w-full">
                   <button type="button" onClick={() => { openDialog(taskStatus.statusId); }} className="flex w-full bg-white rounded-lg shadow-lg justify-center">
                     <p className="p-4">+</p>

@@ -35,7 +35,7 @@ export const fetchBoard = async (accessToken: string, boardId: string) => {
 }
 
 export const createTaskCard = async (accessToken: string, boardId: string, taskName: string, taskStatus: string) => {
-  const url = baseUrl + `/task`;
+  const url = baseUrl + '/task';
   return fetch(url, {
     method: "POST",
       headers: {
@@ -47,5 +47,17 @@ export const createTaskCard = async (accessToken: string, boardId: string, taskN
       name: taskName,
       status: taskStatus,
     })
+  })
+}
+
+export const fetchTasks = async (accessToken: string, boardId: string) => {
+  const param = {'boardId': boardId};
+  const query = new URLSearchParams(param)
+  const url = baseUrl + `/tasks?${query}`;
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
   })
 }
