@@ -1,11 +1,12 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
-import { stringify } from "postcss";
-import { FormEventHandler, useRef } from "react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { FormEventHandler, useRef, useState } from "react";
 import invariant from 'tiny-invariant';
+import { DragDropContext, Droppable, Draggable, DropResult, resetServerContext } from "react-beautiful-dnd";
 import { fetchBoard, fetchTasks } from "~/app";
 
 import { getSession } from "~/session"
+import Tasklist from "~/components/Tasklist";
 
 export const loader = async ({
   request,
@@ -46,6 +47,7 @@ export const loader = async ({
   return json({ boardDetail: boardDetails, tasks: tasks });
 }
 
+resetServerContext();
 
 export default function Index() {
   const { boardDetail, tasks } = useLoaderData<typeof loader>();
@@ -86,6 +88,45 @@ export default function Index() {
     }
   };
 
+  const [t, updateTasks] = useState(tasks);
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+    if (!destination) {
+      return;
+    }
+
+    if (destination.droppableId === source.droppableId
+      && destination.index === source.index) {
+      return;
+    }
+
+    const items = reorder(
+      t.items,
+      source.index,
+      destination.index
+    );
+
+    updateTasks({ items });
+  };
+  const reorder = (
+    list: object[],
+    startIndex: number,
+    endIndex: number
+  ): object[] => {
+    const result: any = Array.from(list);
+    result.map((t: any) => {
+      if (t.order < startIndex || t.order > endIndex) {
+        return;
+      }
+      if (t.order == endIndex) {
+        t.order = startIndex;
+      }
+      t.order++;
+    })
+
+    return result;
+  };
+
   return (
     <>
       <div className="mx-auto">
@@ -96,31 +137,8 @@ export default function Index() {
           {
             boardDetail.taskStatus.map((taskStatus: { boardId: string, statusId: string, statusName: string, order: number }) => {
               return (
-                <div>
-                  <div className="max-w-xl flex-col items-start justify-between p-3 bg-gray-100 rounded-lg shadow-lg">
-                    <p>{taskStatus.statusName}</p>
-                  </div>
-                  <div className="grow max-h-[75%] overflow-y-auto h-fit bg-gray-100 rounded-lg shadow-lg p-6" key={taskStatus.statusId}>
-                    {
-                      tasks.sort((a: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }, b: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => { return a.order - b.order }).map((task: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => {
-                        if (taskStatus.statusId !== task.taskStatusId) {
-                          return;
-                        }
-                        return (
-                          <div className="max-w-full pb-4" key={task.name + task.order}>
-                            <button type="button" onClick={() => { openDialog(taskStatus.statusId); }} className="flex-col w-full bg-white rounded-lg shadow-lg justify-center">
-                              <p className="p-4">{task.name}</p>
-                            </button>
-                          </div>
-                        )
-                      })
-                    }
-                    <div className="max-w-full">
-                      <button type="button" onClick={() => { openDialog(taskStatus.statusId); }} className="flex-col w-full bg-white rounded-lg shadow-lg justify-center">
-                        <p className="p-4">+</p>
-                      </button>
-                    </div>
-                  </div>
+                <div key={taskStatus.statusId}>
+                  <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openDialog}></Tasklist>
                 </div>
               )
             })
@@ -173,7 +191,7 @@ export default function Index() {
             </div>
           </div>
         </dialog>
-      </div>
+      </div >
     </>
   )
 }
