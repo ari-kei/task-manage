@@ -1,4 +1,5 @@
 import TaskCard from "./TaskCard";
+import { task } from "~/routes/board.$boardId";
 
 export default function Index(props: {
   taskStatus: { boardId: string, statusId: string, statusName: string, order: number },
@@ -12,14 +13,14 @@ export default function Index(props: {
       </div>
       <div className="grow max-h-[75%] overflow-y-auto h-fit bg-gray-100 rounded-lg shadow-lg p-6" key={props.taskStatus.statusId}>
         {
-          props.tasks.sort((a: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }, b: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => { return a.order - b.order }).map((task: { boardId: string, taskStatusId: string, name: string, description: string, dueDate: Date, order: number }) => {
-            if (props.taskStatus.statusId !== task.taskStatusId) {
-              return;
-            }
-            return (
-              <TaskCard task={task} key={task.boardId + task.taskStatusId + task.order}></TaskCard>
-            )
-          })
+          props.tasks
+            .filter((task: task) => task.taskStatusId === props.taskStatus.statusId)
+            .sort((a: task, b: task) => { return a.order - b.order })
+            .map((task: task, index: number) => {
+              return (
+                <TaskCard task={task} index={index} key={task.boardId + task.taskStatusId + task.order}></TaskCard>
+              )
+            })
         }
         <div className="max-w-full">
           <button type="button" onClick={() => props.openDialog(props.taskStatus.statusId)} className="flex-col w-full bg-white rounded-lg shadow-lg justify-center">

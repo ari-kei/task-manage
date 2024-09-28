@@ -2,11 +2,35 @@ import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { FormEventHandler, useRef, useState } from "react";
 import invariant from 'tiny-invariant';
-import { DragDropContext, Droppable, Draggable, DropResult, resetServerContext } from "react-beautiful-dnd";
+import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
 import { fetchBoard, fetchTasks } from "~/app";
 
 import { getSession } from "~/session"
 import Tasklist from "~/components/Tasklist";
+
+type boardDetail = {
+  board: {
+    id: string,
+    name: string,
+  },
+  taskStatus: [taskStatus]
+}
+
+type taskStatus = {
+  boardId: string,
+  statusId: string,
+  statusName: string,
+  order: number,
+}
+
+export type task = {
+  boardId: string,
+  taskStatusId: string,
+  name: string,
+  description: string,
+  dueDate: string,
+  order: number,
+}
 
 export const loader = async ({
   request,
@@ -24,7 +48,7 @@ export const loader = async ({
   const boardId = params.boardId;
 
   // FIXME ボード取得+タスク取得で非効率になっている部分の改善
-  const boardDetails = await fetchBoard(accessToken, boardId).then(res => {
+  const boardDetails: boardDetail = await fetchBoard(accessToken, boardId).then(res => {
     if (!res.ok) {
       throw new Error(`レスポンスステータス: ${res.status}`);
     }
@@ -34,7 +58,7 @@ export const loader = async ({
     return;
   });
 
-  const tasks = await fetchTasks(accessToken, boardId).then(res => {
+  const tasks: task[] = await fetchTasks(accessToken, boardId).then(res => {
     if (!res.ok) {
       throw new Error(`レスポンスステータス: ${res.status}`);
     }
@@ -46,8 +70,6 @@ export const loader = async ({
 
   return json({ boardDetail: boardDetails, tasks: tasks });
 }
-
-resetServerContext();
 
 export default function Index() {
   const { boardDetail, tasks } = useLoaderData<typeof loader>();
@@ -99,32 +121,45 @@ export default function Index() {
       && destination.index === source.index) {
       return;
     }
-
     const items = reorder(
-      t.items,
-      source.index,
-      destination.index
+      t as task[],
+      source,
+      destination
     );
 
-    updateTasks({ items });
+    updateTasks(items);
   };
   const reorder = (
-    list: object[],
-    startIndex: number,
-    endIndex: number
-  ): object[] => {
-    const result: any = Array.from(list);
-    result.map((t: any) => {
-      if (t.order < startIndex || t.order > endIndex) {
-        return;
-      }
-      if (t.order == endIndex) {
-        t.order = startIndex;
-      }
-      t.order++;
-    })
-
-    return result;
+    list: task[],
+    source: DraggableLocation,
+    destination: DraggableLocation<string>
+  ): task[] => {
+    list
+      .filter((item: task) => {
+        const sourceStatusId: string = boardDetail.board.id + "-" + (Number(source.droppableId) + 1)
+        return item.taskStatusId === sourceStatusId;
+      })
+      .map((item: task) => {
+        // 移動先の対象
+        if (item.order === source.index + 1) {
+          item.order = destination.index + 1;
+          return;
+        }
+        // 下に移動する場合
+        if (source.index < destination.index) {
+          if (item.order > source.index + 1 && item.order <= destination.index + 1) {
+            item.order--;
+            return;
+          }
+          return;
+        }
+        // 上に移動する場合
+        if (item.order < source.index + 1 && item.order >= destination.index + 1) {
+          item.order++;
+          return;
+        }
+      });
+    return list;
   };
 
   return (
@@ -134,15 +169,20 @@ export default function Index() {
       </div>
       <div className="overflow-x-auto h-full flex flex-col">
         <div className={"mb-10 grid max-w-2xl grid-cols-" + colLength + " gap-x-8 gap-y-16 border-t border-gray-200 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-" + colLength}>
-          {
-            boardDetail.taskStatus.map((taskStatus: { boardId: string, statusId: string, statusName: string, order: number }) => {
-              return (
-                <div key={taskStatus.statusId}>
-                  <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openDialog}></Tasklist>
-                </div>
-              )
-            })
-          }
+          <DragDropContext onDragEnd={onDragEnd}>
+            {
+              boardDetail.taskStatus.map((taskStatus: { boardId: string, statusId: string, statusName: string, order: number }, index: number) => (
+                <Droppable droppableId={`${index}`} key={taskStatus.statusId}>
+                  {provided => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openDialog}></Tasklist>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              ))
+            }
+          </DragDropContext>
         </div>
         <dialog ref={dialogRef} id="default-modal" tabIndex={-1} aria-hidden="true"
           className="bg-black bg-opacity-60 overflow-y-auto overflow-x-hidden fixed justify-center items-center w-screen h-screen">
