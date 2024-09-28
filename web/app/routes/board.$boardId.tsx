@@ -129,36 +129,52 @@ export default function Index() {
 
     updateTasks(items);
   };
+
   const reorder = (
     list: task[],
     source: DraggableLocation,
     destination: DraggableLocation<string>
   ): task[] => {
-    list
-      .filter((item: task) => {
-        const sourceStatusId: string = boardDetail.board.id + "-" + (Number(source.droppableId) + 1)
-        return item.taskStatusId === sourceStatusId;
-      })
-      .map((item: task) => {
-        // 移動先の対象
-        if (item.order === source.index + 1) {
-          item.order = destination.index + 1;
-          return;
-        }
-        // 下に移動する場合
-        if (source.index < destination.index) {
-          if (item.order > source.index + 1 && item.order <= destination.index + 1) {
-            item.order--;
-            return;
+    const sourceStatusId: string = `${boardDetail.board.id}-${Number(source.droppableId) + 1}`;
+    const destinationStatusId: string = `${boardDetail.board.id}-${Number(destination.droppableId) + 1}`;
+
+    const updateOrder = (item: task, newOrder: number) => {
+      item.order = newOrder;
+    };
+
+    if (sourceStatusId === destinationStatusId) {
+      list.forEach((item: task) => {
+        if (item.taskStatusId === sourceStatusId) {
+          // 移動先の対象
+          if (item.order === source.index + 1) {
+            updateOrder(item, destination.index + 1);
+          } else if (source.index < destination.index && item.order > source.index + 1 && item.order <= destination.index + 1) {
+            updateOrder(item, item.order - 1);
+          } else if (source.index > destination.index && item.order < source.index + 1 && item.order >= destination.index + 1) {
+            updateOrder(item, item.order + 1);
           }
-          return;
-        }
-        // 上に移動する場合
-        if (item.order < source.index + 1 && item.order >= destination.index + 1) {
-          item.order++;
-          return;
         }
       });
+      return list;
+    }
+
+    list.forEach((item: task) => {
+      if (item.taskStatusId === destinationStatusId && item.order >= destination.index + 1) {
+        updateOrder(item, item.order + 1);
+      }
+    });
+
+    list.forEach((item: task) => {
+      if (item.taskStatusId === sourceStatusId) {
+        if (item.order === source.index + 1) {
+          item.taskStatusId = destinationStatusId;
+          updateOrder(item, destination.index + 1);
+        } else if (item.order > source.index + 1) {
+          updateOrder(item, item.order - 1);
+        }
+      }
+    });
+
     return list;
   };
 
