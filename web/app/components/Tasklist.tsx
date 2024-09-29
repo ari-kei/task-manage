@@ -1,9 +1,9 @@
 import TaskCard from "./TaskCard";
-import { task } from "~/routes/board.$boardId";
+import { task, taskStatus } from "~/routes/board.$boardId";
 
 export default function Index(props: {
-  taskStatus: { boardId: string, statusId: string, statusName: string, order: number },
-  tasks: any,
+  taskStatus: taskStatus,
+  tasks: task[],
   openDialog: (statusId: string) => void,
 }) {
   return (

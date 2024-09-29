@@ -16,7 +16,7 @@ type boardDetail = {
   taskStatus: [taskStatus]
 }
 
-type taskStatus = {
+export type taskStatus = {
   boardId: string,
   statusId: string,
   statusName: string,
