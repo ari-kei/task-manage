@@ -2,15 +2,16 @@ package com.arikei.app.interfaces;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.arikei.app.domains.BoardService;
 import com.arikei.app.domains.entities.Board;
 import com.arikei.app.interfaces.response.FetchListResponse;
 
 @RequestMapping("/boards")
-@Controller
+@RestController
 public class BoardsController {
 
   private final BoardService boardService;

@@ -2,12 +2,12 @@ package com.arikei.app.interfaces;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.arikei.app.domains.BoardService;
 import com.arikei.app.domains.entities.Board;
@@ -16,7 +16,7 @@ import com.arikei.app.interfaces.request.CreateBoardRequest;
 import jakarta.servlet.ServletRequest;
 
 @RequestMapping("/board")
-@Controller
+@RestController
 public class BoardController {
 
   private BoardService boardService;
