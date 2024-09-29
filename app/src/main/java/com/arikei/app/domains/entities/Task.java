@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Task {
   public String boardId;
+  public String taskId;
   public String taskStatusId;
   public String name;
   public String description;
