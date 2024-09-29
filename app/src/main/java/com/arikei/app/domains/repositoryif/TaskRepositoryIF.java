@@ -8,4 +8,6 @@ public interface TaskRepositoryIF {
   public void create(TaskCard taskCard);
 
   public List<Task> fetchList(String boardId);
+
+  public Task fetchOne(String boardId, String taskId);
 }

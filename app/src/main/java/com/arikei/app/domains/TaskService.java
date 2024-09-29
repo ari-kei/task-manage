@@ -25,4 +25,8 @@ public class TaskService {
   public List<Task> fetchList(String boardId) {
     return this.taskRepositoryIF.fetchList(boardId);
   }
+
+  public Task fetchOne(String boardId, String taskId) {
+    return this.taskRepositoryIF.fetchOne(boardId, taskId);
+  }
 }

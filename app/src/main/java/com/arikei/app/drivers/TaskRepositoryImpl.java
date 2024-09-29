@@ -27,4 +27,8 @@ public class TaskRepositoryImpl implements TaskRepositoryIF {
         new Task("1", "j", "1-2", "タスク名称今月着手1", "タスク説明今月着手1", LocalDateTime.now(), 1),
         new Task("1", "k", "1-3", "タスク名称着手中1", "タスク説明着手中1", LocalDateTime.now(), 1));
   }
+
+  public Task fetchOne(String boardId, String taskId) {
+    return new Task("1", "a", "1-1", "タスク名称", "タスク説明", LocalDateTime.now(), 1);
+  }
 }
