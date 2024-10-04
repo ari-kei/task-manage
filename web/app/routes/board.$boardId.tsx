@@ -1,12 +1,13 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Outlet, useFetcher, useLoaderData, useParams } from "@remix-run/react";
 import { FormEventHandler, useRef, useState } from "react";
 import invariant from 'tiny-invariant';
 import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
-import { fetchBoard, fetchTasks } from "~/app";
+import { fetchBoard, fetchTask, fetchTasks } from "~/app";
 
 import { getSession } from "~/session"
 import Tasklist from "~/components/Tasklist";
+import Modal from "~/components/Modal";
 
 type boardDetail = {
   board: {
@@ -25,6 +26,7 @@ export type taskStatus = {
 
 export type task = {
   boardId: string,
+  taskId: string,
   taskStatusId: string,
   name: string,
   description: string,
@@ -73,6 +75,7 @@ export const loader = async ({
 
 export default function Index() {
   const { boardDetail, tasks } = useLoaderData<typeof loader>();
+  const [modalType, setModalType] = useState<"create" | "detail" | null>(null);
   const colLength = boardDetail.taskStatus.length;
   const fetcher = useFetcher();
 
@@ -90,24 +93,15 @@ export default function Index() {
       action: "taskCard",
       method: "POST",
     });
-    closeDialog();
+    closeModal();
   };
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const openDialog = (statusId: string) => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-      const taskStatusField: HTMLInputElement | null = document.querySelector("#new-taskcard-status");
-      if (taskStatusField) {
-        taskStatusField.value = statusId;
-      }
-
-    }
+  const openCreateModal = () => {
+    setModalType("create");
   };
-  const closeDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.close();
-    }
+
+  const closeModal = () => {
+    setModalType(null);
   };
 
   const [t, updateTasks] = useState(tasks);
@@ -191,7 +185,7 @@ export default function Index() {
                 <Droppable droppableId={`${index}`} key={taskStatus.statusId}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openDialog}></Tasklist>
+                      <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openCreateModal}></Tasklist>
                       {provided.placeholder}
                     </div>
                   )}
@@ -200,54 +194,32 @@ export default function Index() {
             }
           </DragDropContext>
         </div>
-        <dialog ref={dialogRef} id="default-modal" tabIndex={-1} aria-hidden="true"
-          className="bg-black bg-opacity-60 overflow-y-auto overflow-x-hidden fixed justify-center items-center w-screen h-screen">
-          <div className="relative p-4 w-full m-auto mt-[7%] max-w-2xl max-h-full">
-            <div className="relative bg-white rounded-lg shadow">
-              <fetcher.Form method={'post'} onSubmit={handleTaskSubmit}>
-                <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-                  <h3 className="text-xl font-semibold text-gray-900 ">
-                    新規タスク作成
-                  </h3>
-                  <button type="button" onClick={() => { closeDialog(); }}
-                    className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-11 h-11 ms-auto inline-flex justify-center items-center"
-                    data-modal-hide="default-modal">
-                    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 14 14">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                    </svg>
-                    <span className="sr-only">閉じる</span>
-                  </button>
-                </div>
-                <div className="p-4 md:p-5 space-y-4">
-                  <div>
-                    <input type="hidden" id="new-taskcard-status" name={'taskStatus'} />
-                    <label htmlFor="taskName"
-                      className="block mb-2 text-sm font-medium text-gray-900">タスク名</label>
-                    <input type="text" name={'taskName'}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                      placeholder="タスク名" required />
-                  </div>
-                </div>
-                <div className={'flex justify-between items-center'}>
-                  <div>
-
-                  </div>
-                  <div className="flex items-center p-4 md:p-5 rounded-b">
-                    <button data-modal-hide="default-modal" type="submit"
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">保存
-                    </button>
-                    <button data-modal-hide="default-modal" type="button" onClick={() => { closeDialog(); }}
-                      className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">キャンセル
-                    </button>
-                  </div>
-                </div>
-              </fetcher.Form>
+        <Modal isOpen={modalType === "create"} onClose={closeModal} title="新規タスク作成">
+          <fetcher.Form method={'post'} onSubmit={handleTaskSubmit}>
+            <div className="p-4 md:p-5 space-y-4">
+              <div>
+                <input type="hidden" id="new-taskcard-status" name={'taskStatus'} />
+                <label htmlFor="taskName"
+                  className="block mb-2 text-sm font-medium text-gray-900">タスク名</label>
+                <input type="text" name={'taskName'}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                  placeholder="タスク名" required />
+              </div>
             </div>
-          </div>
-        </dialog>
+            <div className={'flex justify-between items-center'}>
+              <div className="flex items-center p-4 md:p-5 rounded-b">
+                <button data-modal-hide="default-modal" type="submit"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">保存
+                </button>
+                <button data-modal-hide="default-modal" type="button" onClick={closeModal}
+                  className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">キャンセル
+                </button>
+              </div>
+            </div>
+          </fetcher.Form>
+        </Modal>
       </div >
+      <Outlet />
     </>
   )
 }
