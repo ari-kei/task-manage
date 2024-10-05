@@ -1,9 +1,9 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { Outlet, useFetcher, useLoaderData, useParams } from "@remix-run/react";
-import { FormEventHandler, useRef, useState } from "react";
+import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import { FormEventHandler, useState } from "react";
 import invariant from 'tiny-invariant';
 import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
-import { fetchBoard, fetchTask, fetchTasks } from "~/app";
+import { fetchBoard, fetchTasks } from "~/app";
 
 import { getSession } from "~/session"
 import Tasklist from "~/components/Tasklist";
@@ -76,6 +76,7 @@ export const loader = async ({
 export default function Index() {
   const { boardDetail, tasks } = useLoaderData<typeof loader>();
   const [modalType, setModalType] = useState<"create" | "detail" | null>(null);
+  const [newTaskStatus, setNewTaskStatus] = useState<string | null>(null);
   const colLength = boardDetail.taskStatus.length;
   const fetcher = useFetcher();
 
@@ -96,12 +97,18 @@ export default function Index() {
     closeModal();
   };
 
-  const openCreateModal = () => {
+  const openCreateModal = (statusId: string) => {
     setModalType("create");
+    setNewTaskStatus(statusId);
+  };
+
+  const openDetailModal = () => {
+    setModalType("detail");
   };
 
   const closeModal = () => {
     setModalType(null);
+    setNewTaskStatus(null);
   };
 
   const [t, updateTasks] = useState(tasks);
@@ -185,7 +192,7 @@ export default function Index() {
                 <Droppable droppableId={`${index}`} key={taskStatus.statusId}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Tasklist taskStatus={taskStatus} tasks={tasks} openDialog={openCreateModal}></Tasklist>
+                      <Tasklist taskStatus={taskStatus} tasks={tasks} opneModal={openCreateModal}></Tasklist>
                       {provided.placeholder}
                     </div>
                   )}
@@ -198,7 +205,7 @@ export default function Index() {
           <fetcher.Form method={'post'} onSubmit={handleTaskSubmit}>
             <div className="p-4 md:p-5 space-y-4">
               <div>
-                <input type="hidden" id="new-taskcard-status" name={'taskStatus'} />
+                <input type="hidden" id="new-taskcard-status" name={'taskStatus'} value={newTaskStatus ?? ''} />
                 <label htmlFor="taskName"
                   className="block mb-2 text-sm font-medium text-gray-900">タスク名</label>
                 <input type="text" name={'taskName'}

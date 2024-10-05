@@ -4,7 +4,7 @@ import { task, taskStatus } from "~/routes/board.$boardId";
 export default function Index(props: {
   taskStatus: taskStatus,
   tasks: task[],
-  openDialog: (statusId: string) => void,
+  opneModal: (statusId: string) => void,
 }) {
   return (
     <>
@@ -23,7 +23,7 @@ export default function Index(props: {
             })
         }
         <div className="max-w-full">
-          <button type="button" onClick={() => props.openDialog(props.taskStatus.statusId)} className="flex-col w-full bg-white rounded-lg shadow-lg justify-center">
+          <button type="button" onClick={() => props.opneModal(props.taskStatus.statusId)} className="flex-col w-full bg-white rounded-lg shadow-lg justify-center">
             <p className="p-4">+</p>
           </button>
         </div>
