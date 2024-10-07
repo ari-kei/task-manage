@@ -61,3 +61,13 @@ export const fetchTasks = async (accessToken: string, boardId: string) => {
     }
   })
 }
+
+export const fetchTask = async (accessToken: string, boardId: string, taskId: string) => {
+  const url = baseUrl + `/task?boardId=${boardId}&taskId=${taskId}`;
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+}
