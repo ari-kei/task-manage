@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { Outlet, useFetcher, useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { FormEventHandler, useEffect, useState } from "react";
 import invariant from 'tiny-invariant';
 import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
@@ -31,7 +31,7 @@ export type task = {
   taskStatusId: string,
   name: string,
   description: string,
-  dueDate: string,
+  dueDate: Array<string>,
   order: number,
 }
 
@@ -99,7 +99,7 @@ export default function Index() {
     closeCreateModal();
   };
 
-  const handleUpdateTaskCard: FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleUpdateTask: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     // TODO タスクの更新フォームを作成する
@@ -253,9 +253,9 @@ export default function Index() {
             </div>
           </fetcher.Form>
         </Modal>
-        <Modal isOpen={modalType === "update"} onClose={closeUpdateModal} title={updateTask?.name ?? ''}>
-          <fetcher.Form method={'post'} onSubmit={handleUpdateTaskCard}>
-            <TaskForm task={updateTask ?? null}></TaskForm>
+        <Modal isOpen={modalType === "update"} onClose={closeUpdateModal} title="タスク更新">
+          <fetcher.Form method={'post'} onSubmit={handleUpdateTask}>
+            <TaskForm task={updateTask ?? null} onClose={closeUpdateModal}></TaskForm>
           </fetcher.Form>
         </Modal>
       </div >
