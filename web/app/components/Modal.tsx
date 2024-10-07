@@ -5,6 +5,7 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
+// TODO フォーカストラップを実現したい
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
