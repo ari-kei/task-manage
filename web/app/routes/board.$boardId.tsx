@@ -1,6 +1,6 @@
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
-import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
-import { FormEventHandler, useState } from "react";
+import { Outlet, useFetcher, useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { FormEventHandler, useEffect, useState } from "react";
 import invariant from 'tiny-invariant';
 import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
 import { fetchBoard, fetchTasks } from "~/app";
@@ -8,6 +8,7 @@ import { fetchBoard, fetchTasks } from "~/app";
 import { getSession } from "~/session"
 import Tasklist from "~/components/Tasklist";
 import Modal from "~/components/Modal";
+import TaskForm from "~/components/TaskForm";
 
 type boardDetail = {
   board: {
@@ -75,12 +76,13 @@ export const loader = async ({
 
 export default function Index() {
   const { boardDetail, tasks } = useLoaderData<typeof loader>();
-  const [modalType, setModalType] = useState<"create" | "detail" | null>(null);
+  const [modalType, setModalType] = useState<"create" | "update" | null>(null);
   const [newTaskStatus, setNewTaskStatus] = useState<string | null>(null);
+  const [updateTask, setUpdateTask] = useState<task | null>(null);
   const colLength = boardDetail.taskStatus.length;
   const fetcher = useFetcher();
 
-  const handleTaskSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleNewTaskCard: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     const target = e.target as typeof e.target & {
@@ -94,7 +96,18 @@ export default function Index() {
       action: "taskCard",
       method: "POST",
     });
-    closeModal();
+    closeCreateModal();
+  };
+
+  const handleUpdateTaskCard: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+
+    // TODO タスクの更新フォームを作成する
+    const target = e.target as typeof e.target & {
+      taskName: { value: string },
+    };
+    const formData = new FormData();
+    formData.append("taskName", target.taskName.value);
   };
 
   const openCreateModal = (statusId: string) => {
@@ -102,14 +115,29 @@ export default function Index() {
     setNewTaskStatus(statusId);
   };
 
-  const openDetailModal = () => {
-    setModalType("detail");
+  const openUpdateModal = (taskId: string) => {
+    setModalType("update");
+    const foundTask = tasks.find(task => task.taskId === taskId);
+    setUpdateTask(foundTask || null);
   };
 
-  const closeModal = () => {
+  const closeCreateModal = () => {
     setModalType(null);
     setNewTaskStatus(null);
   };
+
+  const navigate = useNavigate();
+  const closeUpdateModal = () => {
+    setModalType(null);
+    navigate(`/board/${boardDetail.board.id}`);
+  };
+
+  const { _, taskId } = useParams();
+  useEffect(() => {
+    if (taskId) {
+      openUpdateModal(taskId);
+    }
+  }, [taskId]);
 
   const [t, updateTasks] = useState(tasks);
   const onDragEnd = (result: DropResult) => {
@@ -192,7 +220,7 @@ export default function Index() {
                 <Droppable droppableId={`${index}`} key={taskStatus.statusId}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Tasklist taskStatus={taskStatus} tasks={tasks} opneModal={openCreateModal}></Tasklist>
+                      <Tasklist taskStatus={taskStatus} tasks={tasks} openCreateModal={openCreateModal}></Tasklist>
                       {provided.placeholder}
                     </div>
                   )}
@@ -201,8 +229,8 @@ export default function Index() {
             }
           </DragDropContext>
         </div>
-        <Modal isOpen={modalType === "create"} onClose={closeModal} title="新規タスク作成">
-          <fetcher.Form method={'post'} onSubmit={handleTaskSubmit}>
+        <Modal isOpen={modalType === "create"} onClose={closeCreateModal} title="新規タスク作成">
+          <fetcher.Form method={'post'} onSubmit={handleNewTaskCard}>
             <div className="p-4 md:p-5 space-y-4">
               <div>
                 <input type="hidden" id="new-taskcard-status" name={'taskStatus'} value={newTaskStatus ?? ''} />
@@ -218,15 +246,19 @@ export default function Index() {
                 <button data-modal-hide="default-modal" type="submit"
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">保存
                 </button>
-                <button data-modal-hide="default-modal" type="button" onClick={closeModal}
+                <button data-modal-hide="default-modal" type="button" onClick={closeCreateModal}
                   className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">キャンセル
                 </button>
               </div>
             </div>
           </fetcher.Form>
         </Modal>
+        <Modal isOpen={modalType === "update"} onClose={closeUpdateModal} title={updateTask?.name ?? ''}>
+          <fetcher.Form method={'post'} onSubmit={handleUpdateTaskCard}>
+            <TaskForm task={updateTask ?? null}></TaskForm>
+          </fetcher.Form>
+        </Modal>
       </div >
-      <Outlet />
     </>
   )
 }
