@@ -1,14 +1,14 @@
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node"
+import { json, LoaderFunctionArgs } from "@remix-run/node"
 import { useFetcher, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { FormEventHandler, useEffect, useState } from "react";
 import invariant from 'tiny-invariant';
 import { DragDropContext, DraggableLocation, Droppable, DropResult } from "@hello-pangea/dnd";
 import { fetchBoard, fetchTasks } from "~/app";
 
-import { getSession } from "~/session"
 import Tasklist from "~/components/Tasklist";
 import Modal from "~/components/Modal";
 import TaskForm from "~/components/TaskForm";
+import { requireAuth } from "~/middleware/auth";
 
 type boardDetail = {
   board: {
@@ -39,13 +39,8 @@ export const loader = async ({
   request,
   params
 }: LoaderFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  )
-  const accessToken = session.get("accessToken");
-  if (accessToken == undefined || accessToken.length <= 0) {
-    return redirect("/login");
-  }
+  const [accessToken, authRedirect] = await requireAuth(request);
+  if (accessToken === "") return authRedirect;
 
   invariant(params.boardId, "");
   const boardId = params.boardId;
@@ -75,7 +70,12 @@ export const loader = async ({
 }
 
 export default function Index() {
-  const { boardDetail, tasks } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const boardDetail = data?.boardDetail ?? {
+    board: { id: '', name: '' },
+    taskStatus: []
+  };
+  const tasks = data?.tasks ?? [];
   const [modalType, setModalType] = useState<"create" | "update" | null>(null);
   const [newTaskStatus, setNewTaskStatus] = useState<string | null>(null);
   const [updateTask, setUpdateTask] = useState<task | null>(null);

@@ -1,19 +1,14 @@
-import { defer, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { defer, LoaderFunctionArgs } from "@remix-run/node";
 import { Await, Outlet, useLoaderData } from "@remix-run/react"
 import { Suspense } from "react";
 import { fetchBoards } from "~/app";
-import { getSession } from "~/session";
+import { requireAuth } from "~/middleware/auth";
 
 export const loader = async ({
   request,
 }: LoaderFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  )
-  const accessToken = session.get("accessToken");
-  if (accessToken == undefined || accessToken.length <= 0) {
-    return redirect("/login");
-  }
+  const [accessToken, authRedirect] = await requireAuth(request);
+  if (accessToken === "") return authRedirect;
 
   const boardPromise = fetchBoards(accessToken).then(res => {
     if (!res.ok) {
@@ -29,7 +24,8 @@ export const loader = async ({
 }
 
 export default function Index() {
-  const { boardsPromise } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const boardsPromise = data?.boardsPromise;
   return (
     <>
       <div className="grid grid-cols-4 gap-4">

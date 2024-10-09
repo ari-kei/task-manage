@@ -1,32 +1,23 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, Navigate, redirect, useActionData, useNavigate } from "@remix-run/react";
+import { Form, json, redirect, useActionData, useNavigate } from "@remix-run/react";
 import { postBoard } from "~/app";
-import { getSession } from "~/session";
+import { requireAuth } from "~/middleware/auth";
 
 export const loader = async ({
   request,
 }: LoaderFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  );
-  const accessToken = session.get("accessToken");
-  console.log(accessToken);
-  if (accessToken == undefined || accessToken.length <= 0) {
-    return redirect("/login");
-  }
+  const [accessToken, authRedirect] = await requireAuth(request);
+  if (accessToken === "") return authRedirect;
+
   return json({});
 }
 
 export const action = async ({
   request,
 }: ActionFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  );
-  const accessToken = session.get("accessToken");
-  if (accessToken == undefined || accessToken.length <= 0) {
-    return redirect("/login");
-  }
+  const [accessToken, authRedirect] = await requireAuth(request);
+  if (accessToken === "") return authRedirect;
+
   const formData = await request.formData();
   const boardName = String(formData.get("name"));
 

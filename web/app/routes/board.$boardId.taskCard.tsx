@@ -1,19 +1,15 @@
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { createTaskCard } from "~/app";
-import { getSession } from "~/session";
+import { requireAuth } from "~/middleware/auth";
 
 export const action = async ({
   request,
   params
 }: ActionFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  );
-  const accessToken = session.get("accessToken");
-  if (accessToken == undefined || accessToken.length <= 0) {
-    return redirect("/login");
-  }
+  const [accessToken, authRedirect] = await requireAuth(request);
+  if (accessToken === "") return authRedirect;
+
   const formData = await request.formData();
   const taskStatus = String(formData.get("taskStatus"));
   const taskName = String(formData.get("taskName"));
